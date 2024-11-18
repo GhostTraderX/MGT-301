@@ -1,5 +1,8 @@
 import math
+from operator import length_hint
+
 import pandas as pd
+import numpy as np
 
 
 risk_free_rate = 0.015
@@ -34,3 +37,22 @@ ief_vol = get_annualized_volatility(ief_data)
 spy_ewl_corr = df.corr().loc['SPY', 'EWL']
 spy_ief_corr = df.corr().loc['SPY', 'IEF']
 ewl_ief_corr = df.corr().loc['EWL', 'IEF']
+
+sigma = df.cov()
+sigma_inv = np.linalg.inv(sigma)
+
+mu = np.array([[spy_aer], [ewl_aer], [ief_aer]])
+
+a = 1
+mu_rf = (mu - risk_free_rate * np.ones((len(mu), 1)))
+print('mu_Ref', mu_rf.shape)
+
+weights = np.linalg.inv(a * sigma) @ mu_rf
+
+w_0 = 1 - (np.ones(len(mu)) @ weights)
+
+C = np.ones(len(mu)) @ sigma_inv @ mu_rf
+w_tan = 1/C * sigma_inv @ mu_rf
+
+sharpe_ratio = np.sqrt(mu_rf.T @ sigma_inv @ mu_rf)
+print(sharpe_ratio)
