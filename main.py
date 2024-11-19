@@ -116,7 +116,6 @@ risks = []
 
 for i in range(1000):
     weights = generate_three_numbers_sum_to_one()
-    print(weights)
     returns.append(weights @ mu)
     risks.append(weights @ Sigma @ weights.T)
 
@@ -129,3 +128,12 @@ plt.scatter(risks, returns, c='blue', s=0.7)
 plt.show()
 
 # ====== Question 5 ======
+
+# Target return
+Ra = 0.12
+
+
+C = a * (Ra - R0) / (portfolio_return - R0)
+
+target_weights = C / a * portfolio_weights
+print(target_weights)
