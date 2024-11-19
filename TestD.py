@@ -77,22 +77,23 @@ target_return = 0.12
 def minimize_variance(weights, cov_matrix):
     return variance(weights, cov_matrix)
 
+def minimize_volatility(weights, cov_matrix):
+    return standard_deviation(weights, cov_matrix)
+
 # We update the constraints
 constraints = [
     {'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1},  # Sum = 1
-    {'type': 'eq', 'fun': lambda weights: expected_return(weights, returns_df)},
+    {'type': 'eq', 'fun': lambda weights: expected_return(weights, returns_df) -  target_return},
 ]
 
-# We optimize for minimum variance with the new constraints
-optimized_target_return = minimize(minimize_variance, optimal_weights, args=(cov,),
+# We optimize for minimum -SR with the new constraints
+optimized_target_return = minimize(minimize_volatility, optimal_weights, args= cov,
                                    method='SLSQP', constraints=constraints)
 
 if optimized_target_return.success:
     target_return_weights = optimized_target_return.x
 else:
     print("Optimization failed.")
-    print(r)
-    print(returns_df)
 
 # Gettint the things we wanted
 target_portfolio_return = expected_return(target_return_weights, r)
