@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import yfinance as yf
+import matplotlib.pyplot as plt
 
 risk_free_rate = 0.015
 ones = np.ones(3)
@@ -103,6 +104,8 @@ print("Portfolio Standard Deviation: ", portfolio_std.iloc[0, 0].round(3))
 
 # Portfolio Sharpe Ratio
 portfolio_shape_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
-print("Portfolio Shapre Ratio:", portfolio_shape_ratio[0][0].round(3))
+print("Portfolio Sharpe Ratio:", portfolio_shape_ratio[0][0].round(3))
+
+# ====== Question 4 ======
 
 
