@@ -68,3 +68,6 @@ print(f"Expected Annual Return: {optimal_portfolio_return: .4f}")
 print(f"Expected Variance: {optimal_variance: .4f}")
 print (f"Expected Volatility: {optimal_portfolio_volatility:.4f}")
 print(f"Sharpe Ratio: {optimal_sharpe_ratio:.4f}")
+
+
+# To find
