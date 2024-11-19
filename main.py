@@ -1,13 +1,22 @@
 import pandas as pd
 import numpy as np
+import yfinance as yf
 
 risk_free_rate = 0.015
 ones = np.ones(3)
 
+# Define the tickers and date range
+tickers = ["SPY", "EWL", "IEF"]
+start_date = "2012-12-31"
+end_date = "2024-06-30"
+
+# Download the data with weekly frequency and adjust for dividends
+data = yf.download(tickers, start=start_date, end=end_date, interval="1wk")["Adj Close"]
+
 # Import data
-spy_data = pd.read_csv('SPY.csv')['adjClose']
-ewl_data = pd.read_csv('EWL.csv')['adjClose']
-ief_data = pd.read_csv('IEF.csv')['adjClose']
+spy_data = data['SPY']
+ewl_data = data['EWL']
+ief_data = data['IEF']
 weekly_returns = pd.DataFrame({'SPY': spy_data, 'EWL': ewl_data, 'IEF':ief_data}).pct_change().dropna()
 
 # ====== QUESTION 2 ======
@@ -73,10 +82,27 @@ excess_returns = mu - R0
 # Risk aversion coefficient
 a = 1
 
+# Calculate Tangency Portfolio Weights
 risky_weights = np.linalg.inv(a * Sigma) @ excess_returns
 rf_weight = 1 - ones @ risky_weights
 
 C = ones @ Sigma_inv @ excess_returns
 
 portfolio_weights = 1 / C * (Sigma_inv @ excess_returns)
-print(portfolio_weights)
+print(f'Tangency Portfolio Weights\n SPY: {portfolio_weights[0][0].round(3)}\n EWL: {portfolio_weights[1][0].round(3)}\n IEF: {portfolio_weights[2][0].round(3)}')
+
+# Portfolio return
+portfolio_return = portfolio_weights.T @ mu
+print(f"Tangency Portfolio Return: {portfolio_return[0][0].round(3)}")
+
+# Portfolio variance and std
+portfolio_var = portfolio_weights.T @ Sigma @ portfolio_weights
+print(f"Tangency Portfolio Variance: {portfolio_var.iloc[0, 0].round(3)}")
+portfolio_std = np.sqrt(portfolio_var)
+print("Portfolio Standard Deviation: ", portfolio_std.iloc[0, 0].round(3))
+
+# Portfolio Sharpe Ratio
+portfolio_shape_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
+print("Portfolio Shapre Ratio:", portfolio_shape_ratio[0][0].round(3))
+
+
