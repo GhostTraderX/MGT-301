@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
+import random
 
 risk_free_rate = 0.015
 ones = np.ones(3)
@@ -107,5 +108,26 @@ portfolio_shape_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
 print("Portfolio Sharpe Ratio:", portfolio_shape_ratio[0][0].round(3))
 
 # ====== Question 4 ======
+def generate_three_numbers_sum_to_one():
+    weights = np.random.rand(3)
+    return weights / weights.sum()
 
+returns = []
+risks = []
+
+for i in range(1000):
+    weights = generate_three_numbers_sum_to_one()
+    print(weights)
+    returns.append(weights @ mu)
+    risks.append(weights @ Sigma @ weights.T)
+
+portfolios = zip(risks, returns)
+plt.figure(dpi=600)
+plt.title("Efficient frontier")
+plt.xlabel("Standard deviation")
+plt.ylabel("Mean return")
+plt.scatter(risks, returns, c='blue', s=0.7)
+plt.show()
+
+# ====== Question 5 ======
 
