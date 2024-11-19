@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
-import random
 
 risk_free_rate = 0.015
 ones = np.ones(3)
@@ -130,4 +129,3 @@ plt.scatter(risks, returns, c='blue', s=0.7)
 plt.show()
 
 # ====== Question 5 ======
-
