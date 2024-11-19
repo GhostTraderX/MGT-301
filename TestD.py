@@ -68,6 +68,41 @@ print(f"Expected Annual Return: {optimal_portfolio_return: .4f}")
 print(f"Expected Variance: {optimal_variance: .4f}")
 print (f"Expected Volatility: {optimal_portfolio_volatility:.4f}")
 print(f"Sharpe Ratio: {optimal_sharpe_ratio:.4f}")
+print('\n \n')
 
 
-# To find
+# For question 5, we want to minimize variance while gettint 12% annual return
+target_return = 0.12
+
+def minimize_variance(weights, cov_matrix):
+    return variance(weights, cov_matrix)
+
+# We update the constraints
+constraints = [
+    {'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1},  # Sum = 1
+    {'type': 'eq', 'fun': lambda weights: expected_return(weights, returns_df)},
+]
+
+# We optimize for minimum variance with the new constraints
+optimized_target_return = minimize(minimize_variance, optimal_weights, args=(cov,),
+                                   method='SLSQP', constraints=constraints)
+
+if optimized_target_return.success:
+    target_return_weights = optimized_target_return.x
+else:
+    print("Optimization failed.")
+    print(r)
+    print(returns_df)
+
+# Gettint the things we wanted
+target_portfolio_return = expected_return(target_return_weights, r)
+target_portfolio_volatility = standard_deviation(target_return_weights, cov)
+target_portfolio_variance = variance(target_return_weights, cov)
+optimal_sharpe_ratio = sharpe_ratio(optimal_weights, returns_df, cov, risk_free_rate)
+
+
+print(f"Optimal Weights: {target_return_weights}")
+print(f"Expected Annual Return: {target_portfolio_return:.4f}")
+print(f"Portfolio Variance: {target_portfolio_variance:.4f}")
+print(f"Portfolio Volatility: {target_portfolio_volatility:.4f}")
+print(f"Sharpe Ratio: {optimal_sharpe_ratio:.4f}")
