@@ -105,6 +105,7 @@ print("Portfolio Standard Deviation: ", portfolio_std.iloc[0, 0].round(3))
 # Portfolio Sharpe Ratio
 portfolio_shape_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
 print("Portfolio Sharpe Ratio:", portfolio_shape_ratio[0][0].round(3))
+print()
 
 # ====== Question 4 ======
 def generate_three_numbers_sum_to_one():
@@ -124,6 +125,8 @@ plt.figure(dpi=600)
 plt.title("Efficient frontier")
 plt.xlabel("Standard deviation")
 plt.ylabel("Mean return")
+x = np.linspace(min(risks), max(risks), 100)
+plt.plot(x, risk_free_rate + portfolio_shape_ratio[0][0] * x)
 plt.scatter(risks, returns, c='blue', s=0.7)
 plt.show()
 
@@ -132,8 +135,12 @@ plt.show()
 # Target return
 Ra = 0.12
 
-
 C = a * (Ra - R0) / (portfolio_return - R0)
 
 target_weights = C / a * portfolio_weights
-print(target_weights)
+print(f'Target Weights\n SPY: {target_weights[0][0].round(3)}\n EWL: {target_weights[1][0].round(3)}\n IEF: {target_weights[2][0].round(3)}')
+print()
+
+# Calculate implied risk aversion
+gamma = (portfolio_return[0][0] - risk_free_rate) / (portfolio_var.iloc[0, 0])
+print("Implied risk aversion coefficient:", gamma.round(3))
