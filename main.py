@@ -109,25 +109,30 @@ print()
 
 # ====== Question 4 ======
 def generate_three_numbers_sum_to_one():
-    weights = np.random.rand(3)
-    return weights / weights.sum()
+    weight_1 = np.random.uniform(0, 1)
+    weight_2 = np.random.uniform(0, 1)
+    weight_3 = 1 - weight_1 - weight_2
+
+    return np.array([[weight_1], [weight_2], [weight_3]])
+
 
 returns = []
-risks = []
+std_dev = []
 
 for i in range(1000):
     weights = generate_three_numbers_sum_to_one()
-    returns.append(weights @ mu)
-    risks.append(weights @ Sigma @ weights.T)
+    returns.append((weights.T @ mu)[0][0])
+    std_dev.append(np.sqrt((weights.T @ Sigma @ weights).iloc[0, 0]))
 
-portfolios = zip(risks, returns)
+
+portfolios = zip(std_dev, returns)
 plt.figure(dpi=600)
 plt.title("Efficient frontier")
 plt.xlabel("Standard deviation")
 plt.ylabel("Mean return")
-x = np.linspace(min(risks), max(risks), 100)
-plt.plot(x, risk_free_rate + portfolio_shape_ratio[0][0] * x)
-plt.scatter(risks, returns, c='blue', s=0.7)
+plt.scatter(std_dev, returns, s=0.5)
+# risk_free_rate + portfolio_shape_ratio[0][0] * x
+
 plt.show()
 
 # ====== Question 5 ======
