@@ -146,6 +146,8 @@ target_weights = C / a * portfolio_weights
 print(f'Target Weights\n SPY: {target_weights[0][0].round(3)}\n EWL: {target_weights[1][0].round(3)}\n IEF: {target_weights[2][0].round(3)}')
 print()
 
+# ====== Question 6 ======
+
 # Calculate volatility
 target_var = target_weights.T @ Sigma @ target_weights
 print(f"Target Portfolio Variance: {target_var.iloc[0, 0].round(3)}")
