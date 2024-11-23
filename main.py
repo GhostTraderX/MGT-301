@@ -146,6 +146,16 @@ target_weights = C / a * portfolio_weights
 print(f'Target Weights\n SPY: {target_weights[0][0].round(3)}\n EWL: {target_weights[1][0].round(3)}\n IEF: {target_weights[2][0].round(3)}')
 print()
 
+# Calculate volatility
+target_var = target_weights.T @ Sigma @ target_weights
+print(f"Target Portfolio Variance: {target_var.iloc[0, 0].round(3)}")
+target_std = np.sqrt(target_var)
+print("Target Portfolio Standard Deviation: ", target_std.iloc[0, 0].round(3))
+
+# Calculate Sharpe Ratio
+target_sharpe_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
+print("Target Portfolio Sharpe Ratio:", target_sharpe_ratio[0][0].round(3))
+
 # Calculate implied risk aversion
 gamma = (portfolio_return[0][0] - risk_free_rate) / (portfolio_var.iloc[0, 0])
 print("Implied risk aversion coefficient:", gamma.round(3))
