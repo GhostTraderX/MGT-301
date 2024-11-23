@@ -71,7 +71,7 @@ vols_matrix = vols.T @ vols
 
 Sigma = corr_matrix * vols_matrix
 Sigma_inv = np.linalg.inv(Sigma)
-print("Simga matrix :\n", Sigma.round(3))
+print("Sigma matrix :\n", Sigma.round(3))
 print()
 
 # Returns vectors
@@ -155,7 +155,7 @@ target_std = np.sqrt(target_var)
 print("Target Portfolio Standard Deviation: ", target_std.iloc[0, 0].round(3))
 
 # Calculate Sharpe Ratio
-target_sharpe_ratio = np.sqrt(excess_returns.T @ Sigma_inv @ excess_returns)
+target_sharpe_ratio = (Ra - risk_free_rate)/target_std
 print("Target Portfolio Sharpe Ratio:", target_sharpe_ratio[0][0].round(3))
 
 # Calculate implied risk aversion
