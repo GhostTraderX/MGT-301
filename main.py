@@ -108,32 +108,74 @@ print("Portfolio Sharpe Ratio:", portfolio_shape_ratio[0][0].round(3))
 print()
 
 # ====== Question 4 ======
-def generate_three_numbers_sum_to_one():
-    weight_1 = np.random.uniform(0, 1)
-    weight_2 = np.random.uniform(0, 1)
-    weight_3 = 1 - weight_1 - weight_2
 
-    return np.array([[weight_1], [weight_2], [weight_3]])
-
-
-returns = []
-std_dev = []
-
-for i in range(1000):
-    weights = generate_three_numbers_sum_to_one()
-    returns.append((weights.T @ mu)[0][0])
-    std_dev.append(np.sqrt((weights.T @ Sigma @ weights).iloc[0, 0]))
+def calculate_portfolio_stats(weights, annualized_return, cov_matrix_annual):
+    portfolio_mean = np.dot(weights, annualized_return)
+    portfolio_variance = weights.T @ cov_matrix_annual @ weights
+    return portfolio_mean, portfolio_variance
 
 
-portfolios = zip(std_dev, returns)
-plt.figure(dpi=600)
-plt.title("Efficient frontier")
-plt.xlabel("Standard deviation")
-plt.ylabel("Mean return")
-plt.scatter(std_dev, returns, s=0.5)
-# risk_free_rate + portfolio_shape_ratio[0][0] * x
+def generate_efficient_frontier(annualized_return, cov_matrix_annual, num_points, risk_free_rate):
+    weights_spy = np.linspace(-1, 2, num_points)
+    frontier_means, frontier_variances = [], []
 
-plt.show()
+    for w_spy in weights_spy:
+        for w_ewl in np.linspace(-1, 2 - w_spy, num_points):
+            w_ief = 1 - w_spy - w_ewl
+            weights = np.array([w_spy, w_ewl, w_ief])
+            portfolio_mean, portfolio_variance = calculate_portfolio_stats(weights, annualized_return,
+                                                                           cov_matrix_annual)
+            frontier_means.append(portfolio_mean)
+            frontier_variances.append(portfolio_variance)
+
+    frontier_means = np.array(frontier_means)
+    frontier_std_devs = np.sqrt(frontier_variances)
+    sorted_indices = np.argsort(frontier_std_devs)
+    frontier_means = frontier_means[sorted_indices]
+    frontier_std_devs = frontier_std_devs[sorted_indices]
+
+    efficient_means, efficient_std_devs = [], []
+    for std, mean in zip(frontier_std_devs, frontier_means):
+        if len(efficient_means) == 0 or mean > efficient_means[-1]:
+            efficient_means.append(mean)
+            efficient_std_devs.append(std)
+
+    return np.array(efficient_means), np.array(efficient_std_devs)
+
+
+def calculate_tangency_portfolio(efficient_means, efficient_std_devs, risk_free_rate):
+    sharpe_ratios = (efficient_means - risk_free_rate) / efficient_std_devs
+    max_sharpe_idx = np.argmax(sharpe_ratios)
+    return efficient_means[max_sharpe_idx], efficient_std_devs[max_sharpe_idx], sharpe_ratios[max_sharpe_idx]
+
+
+def plot_efficient_frontier_and_cml(efficient_means, efficient_std_devs, tangency_mean, tangency_std_dev,
+                                    risk_free_rate, sharpe_ratio):
+    slope = sharpe_ratio
+    weights_cml = np.linspace(0, 2, 200)
+    cml_means = risk_free_rate + weights_cml * slope * tangency_std_dev
+    cml_std_devs = weights_cml * tangency_std_dev
+
+
+    plt.figure(dpi=600)
+    plt.plot(efficient_std_devs, efficient_means, 'k--', label='Efficient frontier')
+    plt.plot(cml_std_devs, cml_means, 'b-', label='Capital market line')
+    plt.scatter(tangency_std_dev, tangency_mean, color='orange', label='Tangency portfolio')
+    plt.xlabel("Standard Deviation")
+    plt.ylabel("Expected Return")
+    plt.title("Mean Variance Efficient Frontier")
+    plt.legend()
+    plt.show()
+
+
+num_points = 300
+annualized_return = weekly_returns.mean() * 52
+efficient_means, efficient_std_devs = generate_efficient_frontier(annualized_return, Sigma, num_points,
+                                                                  risk_free_rate)
+tangency_mean, tangency_std_dev, sharpe_ratio = calculate_tangency_portfolio(efficient_means, efficient_std_devs,
+                                                                             risk_free_rate)
+plot_efficient_frontier_and_cml(efficient_means, efficient_std_devs, tangency_mean, tangency_std_dev,
+                                risk_free_rate, sharpe_ratio)
 
 # ====== Question 5 ======
 
@@ -146,6 +188,10 @@ target_weights = C / a * portfolio_weights
 print(f'Target Weights\n SPY: {target_weights[0][0].round(3)}\n EWL: {target_weights[1][0].round(3)}\n IEF: {target_weights[2][0].round(3)}')
 print()
 
+# Calculate implied risk aversion
+gamma = (portfolio_return[0][0] - risk_free_rate) / (portfolio_var.iloc[0, 0])
+print("Implied risk aversion coefficient:", gamma.round(3))
+
 # ====== Question 6 ======
 
 # Calculate volatility
@@ -157,7 +203,3 @@ print("Target Portfolio Standard Deviation: ", target_std.iloc[0, 0].round(3))
 # Calculate Sharpe Ratio
 target_sharpe_ratio = (Ra - risk_free_rate)/target_std
 print("Target Portfolio Sharpe Ratio:", target_sharpe_ratio[0][0].round(3))
-
-# Calculate implied risk aversion
-gamma = (portfolio_return[0][0] - risk_free_rate) / (portfolio_var.iloc[0, 0])
-print("Implied risk aversion coefficient:", gamma.round(3))
