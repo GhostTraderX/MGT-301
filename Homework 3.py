@@ -11,11 +11,10 @@ D = 1 / U           # Down factor
 def h(a):
     return 1
 
-def payoff(k, h, S0, r, N, delta, U, D, q_N):
-    print(k)
-    if k > (N - 1):
+def payoff(k, h, S0, r, N, delta, U, D, q_N, n):
+    if k > n > N - 1:
         return h(1)
     else:
-        return q_N * (payoff(k+1, h, S0, r, N, delta, U, D, q_N) / (np.exp(r * delta))) + (1 - q_N) * payoff(k, h, S0, r, N, delta, U, D, q_N) / (np.exp(r * delta))
+        return q_N * (payoff(k+1, h, S0, r, N, delta, U, D, q_N, n+1) / (np.exp(r * delta))) + (1 - q_N) * payoff(k, h, S0, r, N, delta, U, D, q_N, n+1) / (np.exp(r * delta))
 
-print(payoff(0, h, S0, r, N, delta, U, D, 0.5))
+print(payoff(1, h, S0, r, N, delta, U, D, 0.5, 1))
