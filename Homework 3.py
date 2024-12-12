@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # ======== Question 1 =======
 S0 = 1              # Initial risky price
@@ -40,3 +41,43 @@ C0, a0, b0 = binomial_pricing(S0, k, r, N, delta, U, D, h)
 
 print("Initial price of derivative:", C0)
 print("Initial replicating portfolio:", a0, b0)
+
+#========== Question 2 ==========
+# Initial values
+S0 = 30
+r = 0.05
+k = 30
+T = 1 / 12 # 1 month in years
+
+#To store the results
+prices = []
+a_val = []
+b_val = []
+
+# Loop to get every result + verify if arbitrage free
+# Our goal is to change N and verify if it works
+for N in range(1, 101):
+    delta = T / N
+    U = np.exp(0.2 * np.sqrt(delta))
+    D = 1 / U
+
+    # Arbitrage-free condition
+    if D < np.exp(r * delta) < U:
+        C0, a0, b0 = binomial_pricing(S0, k, r, N, delta, U, D, h)
+        prices.append(C0)
+        a_val.append(a0)
+        b_val.append(b0)
+    else:
+        print("Model with N= ", N, " not arbitrage-free!")
+
+# Plot prices
+N_values = range(1, 101)
+
+plt.figure()
+plt.plot(N_values, prices)
+plt.title("Option prices as function of N")
+plt.xlabel("Option price")
+plt.ylabel("N")
+plt.show()
+
+
