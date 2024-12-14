@@ -79,6 +79,20 @@ N_values = range(2, 101)
 plt.figure()
 plt.plot(N_values, prices)
 plt.title("Option prices as function of N")
-plt.xlabel("Option price")
-plt.ylabel("N")
+plt.xlabel("N")
+plt.ylabel("Option price")
+plt.show()
+
+# Plot a of each portfolio
+plt.plot(N_values, a_val, color="red")
+plt.title("a as function of N")
+plt.xlabel("N")
+plt.ylabel("a and b")
+plt.show()
+
+# Plot b of each portfolio
+plt.plot(N_values, b_val, color="blue")
+plt.title("b as function of N")
+plt.xlabel("N")
+plt.ylabel("a and b")
 plt.show()
