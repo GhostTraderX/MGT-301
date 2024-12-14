@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+np.set_printoptions(precision=3)
+
 # ======== Question 1 =======
 S0 = 1              # Initial risky price
 k = 1               # Strike price
@@ -22,26 +24,32 @@ def binomial_pricing(S0, k, r, N, delta, U, D, h):
 
     # We start the algorithm at the end, so we have to create the array to receive the whole tree
     S_n = [S0 * (U**j) * (D**(N - j)) for j in range(N + 1)]
-    P_t = [h(price) for price in S_n] # This is the payoff function
+    P_N = [h(price) for price in S_n] # This is the payoff function
 
     # Now we do the Backward induction
-    for n in range(N, 0, -1): # Go from N to 0, using a step of -1, meaning we go backwards
-        for j in range(n):    # Passing by every branch of the tree
-            P_t[j] = coeff * (q * P_t[j + 1] + (1 - q) * P_t[j])
+    for n in range(N-1, -1, -1): # Go from N to 0, using a step of -1, meaning we go backwards
+        #print(n)
+        for j in range(n+1): # Passing by every branch of the tree
+            #print(j)
+            P_N[j] = coeff * (q * P_N[j + 1] + (1 - q) * P_N[j])
+        if n == 1:
+            b0 = (P_N[1] - P_N[0]) / (S_n[1] - S_n[0])  # option_values[1] means stock goes up and [0] stock goes down
+            a0 = (U * P_N[0] - D * P_N[1]) / (np.exp(r * delta) * (U - D))
+        #print(P_N)
 
     # We can now compute the replicating portfolio
-    b0 = (P_t[1] - P_t[0]) / (S0 * (U - D))  # option_values[1] means stock goes up and [0] stock goes down
-    a0 = (U * P_t[0] - D * P_t[1]) / (np.exp(r * delta) * (U - D))
-    #a0 = P_t[0] - b0 * S0  # Derived from C0 = a0 + b0 * S0
 
-    return P_t[0], a0, b0
+    #a0 = P_t[0] - b0 * S0  # Derived from C0 = a0 + b0 * S0
+    print(P_N[0])
+    print(P_N[1])
+    return P_N[0], a0, b0
 
 # Code test
 C0, a0, b0 = binomial_pricing(S0, k, r, N, delta, U, D, h)
 
 print("Initial price of derivative:", C0)
 print("Initial replicating portfolio:", a0, b0)
-
+"""
 #========== Question 2 ==========
 # Initial values
 S0 = 30
@@ -78,6 +86,6 @@ plt.plot(N_values, prices)
 plt.title("Option prices as function of N")
 plt.xlabel("Option price")
 plt.ylabel("N")
-plt.show()
+#plt.show()
 
-
+"""
