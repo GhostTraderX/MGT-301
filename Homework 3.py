@@ -28,10 +28,11 @@ def binomial_pricing(S0, k, r, N, delta, U, D, h):
 
     # Now we do the Backward induction
     for n in range(N-1, -1, -1): # Go from N to 0, using a step of -1, meaning we go backwards
+        if  n == 0 or N == 1:      # The given formula makes us use the penultimate branch instead of the last branch
+            a0 = (U * P_N[0] - D * P_N[1]) / (np.exp(r * delta) * (U - D))
         for j in range(n+1): # Passing by every branch of the tree
             P_N[j] = coeff * (q * P_N[j + 1] + (1 - q) * P_N[j])
-        if n == 1:      # The given formula makes us use the penultimate branch instead of the last branch
-            a0 = (U * P_N[0] - D * P_N[1]) / (np.exp(r * delta) * (U - D))
+
 
 
     b0 =  (P_N[0] - a0) / S0  # Derived from C0 = a0 + b0 * S0
@@ -59,7 +60,7 @@ b_val = []
 
 # Loop to get every result + verify if arbitrage free
 # Our goal is to change N and verify if it works
-for N in range(2, 101):
+for N in range(1, 101):
     delta = T / N
     U = np.exp(0.2 * np.sqrt(delta))
     D = 1 / U
@@ -74,7 +75,7 @@ for N in range(2, 101):
         print("Model with N= ", N, " not arbitrage-free!")
 
 # Plot prices
-N_values = range(2, 101)
+N_values = range(1, 101)
 
 plt.figure()
 plt.plot(N_values, prices)
@@ -96,3 +97,4 @@ plt.title("b as function of N")
 plt.xlabel("N")
 plt.ylabel("a and b")
 plt.show()
+
